@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431924738418",
+    "project_id": "roomdecordatabase-43368",
+    "storage_bucket": "roomdecordatabase-43368.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431924738418:android:a9c37ff008742eb8c985eb",
+        "android_client_info": {
+          "package_name": "com.example.roomdecorar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAT4q_xskKfJYRnbw-YnkQw16vAkuDaFDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
