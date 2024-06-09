@@ -9,26 +9,34 @@ class UserInfoScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Information'),
-        backgroundColor: Color.fromRGBO(96, 218, 94, 1),
+        title: const Text(
+          'User Information',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        backgroundColor: Color.fromRGBO(0, 0, 0, 1),
       ),
       backgroundColor: Colors.black, // Set background color to black
       body: user != null
           ? Column(
               children: [
-                SizedBox(height: 90),
-                SizedBox(
-                  width: 150,
-                  height: 150,
-                  child: CircleAvatar(),
+                const SizedBox(height: 90),
+                const CircleAvatar(
+                  backgroundColor:
+                      Colors.white, // Background color for the avatar
+                  radius: 75,
+                  child: Icon(
+                    Icons.account_circle, // Icon for the avatar
+                    size: 150,
+                    color: Colors.grey, // Color of the icon
+                  ),
                 ),
-                SizedBox(height: 90),
+                const SizedBox(height: 90),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${user.displayName}',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
+                      ' ${user.displayName}',
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -49,8 +57,11 @@ class UserInfoScreen extends StatelessWidget {
             )
           : Center(
               child: Text(
-                'User not logged in',
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                'ADMIN',
+                style: TextStyle(
+                    fontSize: 33,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700),
               ),
             ),
       floatingActionButton: Padding(

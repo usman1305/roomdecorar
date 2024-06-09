@@ -17,7 +17,6 @@ class _MyRegisterState extends State<MyRegister> {
   String? _email;
   String? _password;
 
-  // Method to pick an image from the gallery
   Future getImage() async {
     final imagePicker = ImagePicker();
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -75,17 +74,18 @@ class _MyRegisterState extends State<MyRegister> {
                               child: CircleAvatar(
                                 radius: 50,
                                 backgroundColor: Colors.white,
+                                backgroundImage:
+                                    _image == null ? null : FileImage(_image!),
                                 child: _image == null
-                                    ? const Icon(Icons.add_a_photo, size: 40)
-                                    : ClipRRect(
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: Image.file(_image!,
-                                            width: 100,
-                                            height: 100,
-                                            fit: BoxFit.cover),
-                                      ),
+                                    ? const Icon(
+                                        Icons.account_circle_rounded,
+                                        size: 100,
+                                        color: Color.fromARGB(255, 0, 0, 0),
+                                      ) // Icon image when no image is selected
+                                    : null, // No child when an image is selected
                               ),
                             ),
+
                             const SizedBox(
                               height: 20,
                             ),
@@ -94,14 +94,10 @@ class _MyRegisterState extends State<MyRegister> {
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: Colors.grey[850], // Background color
-                                enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                enabledBorder: const OutlineInputBorder(),
                                 focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: Colors.black38,
+                                    color: Colors.white,
                                   ),
                                 ),
                                 hintText: "Name",
@@ -131,15 +127,13 @@ class _MyRegisterState extends State<MyRegister> {
                                   .emailAddress, // Set the keyboard type to email address
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: Colors.grey[850], // Background color
+                                fillColor: Colors.grey[850],
                                 enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                  borderSide: BorderSide(),
+                                ), // Background color
                                 focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: Colors.black38,
+                                    color: Colors.white,
                                   ),
                                 ),
                                 hintText:
@@ -176,17 +170,14 @@ class _MyRegisterState extends State<MyRegister> {
                                 filled: true,
                                 fillColor: Colors.grey[850], // Background color
                                 enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.white,
                                   ),
                                 ),
-                                focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black38,
-                                  ),
-                                ),
-                                hintText:
-                                    "Password", // Changed hintText to "Password"
+                                hintText: "Password",
                                 hintStyle: const TextStyle(
                                   color: Colors.white38,
                                 ),
@@ -225,34 +216,20 @@ class _MyRegisterState extends State<MyRegister> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text('Verify Email have been sent.'),
+                                  ),
+                                );
                                 if (_formKey.currentState!.validate()) {
                                   // If the form is valid, create user with email and password
                                   _formKey.currentState!.save();
                                   try {
                                     await RegisterUserdb.registerUser(
-                                        _name!, _email!, _password!, _image!);
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Account Created'),
-                                          content: const Text(
-                                              'Your account has been created successfully!'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-
-                                    // Show dialog box confirming account creation
+                                        _name!, _email!, _password!);
                                   } catch (e) {
-                                    // Registration failed, handle the error (e.g., show error message)
+                                    // Registration failed the error (e.g., show error message)
                                     print(e);
                                   }
                                 }

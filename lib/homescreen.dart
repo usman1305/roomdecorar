@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roomdecorar/item_model_view.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -6,18 +7,24 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
+    String appBarTitle =
+        user != null ? "Welcome back ${user.displayName} 👋" : "Room Decor AR";
+
     return Scaffold(
       backgroundColor: Colors.black,
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppBar(
-              title: const Text(
-                "Room Decor AR",
+              title: Text(
+                appBarTitle,
                 textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white70),
               ),
-              backgroundColor: const Color.fromRGBO(96, 218, 94, 1),
+              backgroundColor: Color.fromARGB(255, 0, 0, 0),
             ),
             const SectionTitle(title: 'Furniture items'),
             const SizedBox(height: 250, child: FurnitureItems()),
@@ -73,6 +80,23 @@ class FurnitureItems extends StatelessWidget {
             );
           },
         ),
+        CustomItemWidget(
+          imageSrc: 'assets/modelImg/roundTable.png',
+          alt: 'Round Table 1',
+          itemName: 'Round Table 1',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ItemModelView(
+                  modelSrc: 'assets/Models/sidetable.glb',
+                  alt: 'Round Table 1',
+                  itemName: 'Round Table 1',
+                ),
+              ),
+            );
+          },
+        ),
 
         // Add more CustomItemWidget widgets as needed
       ],
@@ -88,23 +112,6 @@ class DecorItem extends StatelessWidget {
     return ListView(
       scrollDirection: Axis.horizontal,
       children: [
-        CustomItemWidget(
-          imageSrc: 'assets/modelImg/wallart1.png',
-          alt: 'WallArt 1',
-          itemName: 'WallArt 1',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ItemModelView(
-                  modelSrc: 'assets/Models/walldecoration1.glb',
-                  alt: 'WallArt 1',
-                  itemName: 'WallArt 1',
-                ),
-              ),
-            );
-          },
-        ),
         CustomItemWidget(
           imageSrc: 'assets/modelImg/sofa1.png',
           alt: 'Sofa 1',
@@ -177,7 +184,7 @@ class CustomItemWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Add to Project',
+                        'View Model',
                         style: TextStyle(
                           color: Colors.white60,
                         ),

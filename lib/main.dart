@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:roomdecorar/bottomnavigation.dart';
+import 'package:roomdecorar/customerbottomnavigation.dart';
 import 'package:roomdecorar/login.dart';
 import 'package:roomdecorar/register.dart';
 import 'package:roomdecorar/homescreen.dart';

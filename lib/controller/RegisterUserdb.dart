@@ -4,7 +4,7 @@ import 'dart:io';
 
 class RegisterUserdb {
   static Future<void> registerUser(
-      String name, String email, String password, File image) async {
+      String name, String email, String password) async {
     try {
       // Create a user with email and password
       UserCredential userCredential =
@@ -34,10 +34,13 @@ class RegisterUserdb {
           .set({
         'name': name,
         'email': email,
-        'image_url': '', // Add image URL if needed
+        // Avoid storing passwords in plaintext (remove 'password' field)
       });
+
+      print('User data added to Firestore successfully');
     } catch (e) {
       // Registration failed, handle the error
+      print('Error registering user: $e');
       throw e;
     }
   }

@@ -22,10 +22,11 @@ class ItemModelView extends StatelessWidget {
       ),
       body: Center(
         child: ModelViewer(
-          backgroundColor: const Color.fromARGB(0xFF, 0xEE, 0xEE, 0xEE),
+          backgroundColor: Color.fromARGB(255, 0, 0, 0),
           src: modelSrc,
           alt: alt,
           ar: true,
+          arScale: ArScale.auto,
           arPlacement: ArPlacement.floor,
           autoRotate: true,
           disableZoom: true,

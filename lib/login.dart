@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:roomdecorar/controller/LoginAuth.dart';
-import 'package:roomdecorar/adminmainscreen.dart';
-import 'package:roomdecorar/bottomnavigation.dart';
+import 'package:roomdecorar/adminnavigationbar.dart';
+import 'package:roomdecorar/customerbottomnavigation.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({Key? key}) : super(key: key);
@@ -18,8 +18,8 @@ class _MyLoginState extends State<MyLogin> {
   String? _password;
 
   // Constants for the predefined email and password
-  static const String _constantEmail = 'admin';
-  static const String _constantPassword = 'admin';
+  static const String _constantEmail = 'musmanejaz007@gmail.com';
+  static const String _constantPassword = 'Gjmptw1234';
 
   @override
   Widget build(BuildContext context) {
@@ -67,13 +67,11 @@ class _MyLoginState extends State<MyLogin> {
         filled: true,
         fillColor: Colors.grey[850],
         enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.white,
-          ),
+          borderSide: BorderSide(),
         ),
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(
-            color: Colors.black38,
+            color: Colors.white,
           ),
         ),
         hintText: "Email",
@@ -107,13 +105,11 @@ class _MyLoginState extends State<MyLogin> {
         filled: true,
         fillColor: Colors.grey[850],
         enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.white,
-          ),
+          borderSide: BorderSide(),
         ),
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(
-            color: Colors.black38,
+            color: Colors.white,
           ),
         ),
         hintText: "Password",
@@ -145,7 +141,8 @@ class _MyLoginState extends State<MyLogin> {
             // Redirect to another screen if the entered email and password match
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => AdminMainScreen()),
+              MaterialPageRoute(
+                  builder: (context) => AdminBottomNaigationbarz()),
             );
           } else {
             // Proceed with regular authentication if the entered details do not match

@@ -44,38 +44,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCarriaBiURPxuoKY_ulZT_OGrUOcOCV9o',
-    appId: '1:431924738418:web:e2e552404ee84fddc985eb',
-    messagingSenderId: '431924738418',
-    projectId: 'roomdecordatabase-43368',
-    authDomain: 'roomdecordatabase-43368.firebaseapp.com',
-    storageBucket: 'roomdecordatabase-43368.appspot.com',
-    measurementId: 'G-F9CDGJ32GW',
+    apiKey: 'AIzaSyAywGAoSS5nBurlTxMMd_A8p4gI0OikqRo',
+    appId: '1:730009823039:web:37d379e319e084c5fcd58a',
+    messagingSenderId: '730009823039',
+    projectId: 'roomdecorarfyp',
+    authDomain: 'roomdecorarfyp.firebaseapp.com',
+    storageBucket: 'roomdecorarfyp.appspot.com',
+    measurementId: 'G-CQB2RQWLP2',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAT4q_xskKfJYRnbw-YnkQw16vAkuDaFDE',
-    appId: '1:431924738418:android:a9c37ff008742eb8c985eb',
-    messagingSenderId: '431924738418',
-    projectId: 'roomdecordatabase-43368',
-    storageBucket: 'roomdecordatabase-43368.appspot.com',
+    apiKey: 'AIzaSyDtpRO79UkdlnQySHBvdo4HQx7Fk-qr5eI',
+    appId: '1:730009823039:android:8ccd173e60ca67eefcd58a',
+    messagingSenderId: '730009823039',
+    projectId: 'roomdecorarfyp',
+    storageBucket: 'roomdecorarfyp.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAZMaMr3HTqc4sTsBtRHtrHavJhCgQssCs',
-    appId: '1:431924738418:ios:372399436f398960c985eb',
-    messagingSenderId: '431924738418',
-    projectId: 'roomdecordatabase-43368',
-    storageBucket: 'roomdecordatabase-43368.appspot.com',
+    apiKey: 'AIzaSyAKbqk4w5d7ZTzVH2PEznz3J0fOr6VWO30',
+    appId: '1:730009823039:ios:fbc803f3adc8e832fcd58a',
+    messagingSenderId: '730009823039',
+    projectId: 'roomdecorarfyp',
+    storageBucket: 'roomdecorarfyp.appspot.com',
     iosBundleId: 'com.example.roomdecorar',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAZMaMr3HTqc4sTsBtRHtrHavJhCgQssCs',
-    appId: '1:431924738418:ios:1d9cabd004f9907fc985eb',
-    messagingSenderId: '431924738418',
-    projectId: 'roomdecordatabase-43368',
-    storageBucket: 'roomdecordatabase-43368.appspot.com',
+    apiKey: 'AIzaSyAKbqk4w5d7ZTzVH2PEznz3J0fOr6VWO30',
+    appId: '1:730009823039:ios:0432d1f466dff405fcd58a',
+    messagingSenderId: '730009823039',
+    projectId: 'roomdecorarfyp',
+    storageBucket: 'roomdecorarfyp.appspot.com',
     iosBundleId: 'com.example.roomdecorar.RunnerTests',
   );
 }

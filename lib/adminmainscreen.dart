@@ -5,8 +5,8 @@ class AdminMainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome Back! 😀',
-            style: const TextStyle(color: Colors.white)),
+        title: const Text('Welcome Back! 😀',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
@@ -14,7 +14,7 @@ class AdminMainScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white70,

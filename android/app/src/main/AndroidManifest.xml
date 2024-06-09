@@ -1,7 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-
 <uses-sdk android:minSdkVersion="24"/>
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-feature android:name="android.hardware.camera.ar" />
@@ -12,7 +11,7 @@
     <application
         android:label="roomdecorar"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         
         <activity
