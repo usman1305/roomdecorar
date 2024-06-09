@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:roomdecorar/userinfoscreen.dart';
 import 'package:roomdecorar/adminmainscreen.dart';
 import 'package:roomdecorar/AddObjectScreen.dart';
+import 'package:roomdecorar/view3dObjects.dart';
 
 class AdminBottomNaigationbarz extends StatefulWidget {
   @override
@@ -65,7 +66,6 @@ class _FluidNavBarDemoState extends State {
           _child = AdminMainScreen();
           break;
         case 1:
-          _child = AddObjectScreen();
           break;
         case 2:
           break;

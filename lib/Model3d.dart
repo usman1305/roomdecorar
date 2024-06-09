@@ -1,9 +1,9 @@
 class Model3d {
-  String category;
-  String objectName;
-  String description;
-  String? imageUrl;
-  String? modelUrl;
+  final String category;
+  final String objectName;
+  final String description;
+  final String? imageUrl;
+  final String? modelUrl;
 
   Model3d({
     required this.category,
@@ -13,6 +13,18 @@ class Model3d {
     this.modelUrl,
   });
 
+  // Factory constructor to create an instance from a map
+  factory Model3d.fromMap(Map<String, dynamic> map) {
+    return Model3d(
+      category: map['category'] ?? '',
+      objectName: map['objectName'] ?? '',
+      description: map['description'] ?? '',
+      imageUrl: map['imageUrl'],
+      modelUrl: map['modelUrl'],
+    );
+  }
+
+  // Method to convert an instance to a map
   Map<String, dynamic> toMap() {
     return {
       'category': category,

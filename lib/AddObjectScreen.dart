@@ -19,6 +19,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
   Uint8List? _modelBytes;
   String? _imageUrl;
   String? _modelUrl;
+  double _uploadProgress = 0.0;
 
   Future<void> pickFile(bool isImage) async {
     try {
@@ -48,6 +49,14 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
     try {
       final storageRef = FirebaseStorage.instance.ref().child(path);
       final uploadTask = storageRef.putData(fileBytes);
+
+      // Track the upload task
+      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        setState(() {
+          _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+        });
+      });
+
       final snapshot = await uploadTask.whenComplete(() => null);
       final downloadUrl = await snapshot.ref.getDownloadURL();
       print('File uploaded: $downloadUrl');
@@ -201,6 +210,13 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
                 label:
                     Text('Upload Image', style: TextStyle(color: Colors.black)),
               ),
+              _imageBytes == null
+                  ? Container()
+                  : LinearProgressIndicator(
+                      value: _uploadProgress,
+                      backgroundColor: Colors.grey[800],
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
               _imageUrl == null ? Container() : Image.network(_imageUrl!),
               SizedBox(height: 20),
               ElevatedButton.icon(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roomdecorar/view3dObjects.dart';
 
 class AdminMainScreen extends StatelessWidget {
   @override
@@ -30,7 +31,10 @@ class AdminMainScreen extends StatelessWidget {
                 elevation: 3,
               ),
               onPressed: () {
-                // Add functionality for the first button
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
               },
               child: Text('View 3D Objects'),
             ),

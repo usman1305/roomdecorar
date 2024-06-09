@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:roomdecorar/customerbottomnavigation.dart';
-import 'package:roomdecorar/login.dart';
+import 'login.dart';
 import 'package:roomdecorar/register.dart';
 import 'package:roomdecorar/homescreen.dart';
 import 'package:roomdecorar/forgetpassword.dart';
