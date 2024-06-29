@@ -24,6 +24,8 @@ class Model3d {
     );
   }
 
+  String? get id => null;
+
   // Method to convert an instance to a map
   Map<String, dynamic> toMap() {
     return {

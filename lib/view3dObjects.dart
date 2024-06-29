@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roomdecorar/AddObjectScreen.dart';
-import 'item_model_view.dart';
 import 'package:roomdecorar/Model3d.dart';
 import 'package:roomdecorar/CustomItemWidget.dart';
+import 'categorizedobjects.dart';
+import 'item_model_view.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -17,45 +18,82 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text(
+          appBarTitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppBar(
-              title: Text(
-                appBarTitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70),
-              ),
-              backgroundColor: Color.fromARGB(255, 0, 0, 0),
-            ),
-            const SectionTitle(title: 'Furniture items'),
-            const SizedBox(
-                height: 250, child: ModelsList(category: 'Furniture')),
-            const SectionTitle(title: 'Wallart Designs'),
-            const SizedBox(
-                height: 250, child: ModelsList(category: 'Wallpaper'))
+          children: const [
+            CategorySection(category: 'Furniture', title: 'Furniture items'),
+            CategorySection(category: 'Wallpaper', title: 'Wallart Designs'),
+            CategorySection(category: 'Ceiling', title: 'Ceiling items'),
           ],
         ),
       ),
-      floatingActionButton: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('models').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-            return FloatingActionButton(
-              onPressed: () {
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddObjectScreen()),
+          );
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.green,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+}
+
+class CategorySection extends StatelessWidget {
+  final String category;
+  final String title;
+
+  const CategorySection({Key? key, required this.category, required this.title})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('models')
+          .where('category', isEqualTo: category)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Container();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddObjectScreen()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CategorizedObjectsScreen(category: category),
+                  ),
                 );
               },
-              child: Icon(Icons.add),
-              backgroundColor: Colors.black,
-            );
-          }
-          return Container(); // Return an empty container if no models exist
-        },
-      ),
+              child: SectionTitle(title: title),
+            ),
+            SizedBox(height: 250, child: ModelsList(category: category)),
+          ],
+        );
+      },
     );
   }
 }
@@ -78,17 +116,7 @@ class ModelsList extends StatelessWidget {
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddObjectScreen()),
-                );
-              },
-              child: Text('Add 3D Model'),
-            ),
-          );
+          return Container();
         }
 
         final models = snapshot.data!.docs

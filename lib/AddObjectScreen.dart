@@ -6,6 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'model3d.dart';
 
 class AddObjectScreen extends StatefulWidget {
+  final String? objectName;
+
+  const AddObjectScreen({Key? key, this.objectName}) : super(key: key);
+
   @override
   _AddObjectScreenState createState() => _AddObjectScreenState();
 }
@@ -21,28 +25,109 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
   String? _modelUrl;
   double _uploadProgress = 0.0;
 
+  @override
+  void initState() {
+    super.initState();
+    _objectName =
+        widget.objectName; // Initialize objectName with provided value
+    if (_objectName != null) {
+      // Load existing data if objectName is provided (editing mode)
+      loadObjectData();
+    }
+  }
+
+  Future<void> loadObjectData() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('models')
+          .where('objectName', isEqualTo: _objectName)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        final modelData = snapshot.docs.first.data();
+        setState(() {
+          _category = modelData['category'];
+          _description = modelData['description'];
+          _imageUrl = modelData['imageUrl'];
+          _modelUrl = modelData['modelUrl'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Object not found for editing')),
+        );
+      }
+    } catch (e) {
+      print('Error loading object data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading object data')),
+      );
+    }
+  }
+
   Future<void> pickFile(bool isImage) async {
     try {
-      final result = await FilePicker.platform.pickFiles(
-        type: isImage ? FileType.image : FileType.custom,
-        allowedExtensions: isImage ? null : ['glb'],
-      );
+      FilePickerResult? result;
 
-      if (result != null) {
+      if (isImage) {
+        result = await FilePicker.platform.pickFiles(type: FileType.image);
+      } else {
+        result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['glb'],
+        );
+      }
+
+      if (result != null && result.files.single.bytes != null) {
         setState(() {
           if (isImage) {
-            _imageBytes = result.files.single.bytes;
+            _imageBytes = result?.files.single.bytes;
           } else {
-            _modelBytes = result.files.single.bytes;
+            _modelBytes = result?.files.single.bytes;
           }
         });
         print('File picked: ${result.files.single.name}');
       } else {
-        print('No file picked.');
+        print('No file picked or file is empty.');
       }
     } catch (e) {
       print('Error picking file: $e');
     }
+  }
+
+  bool isValidImage(Uint8List fileBytes) {
+    const jpgHeader = [0xFF, 0xD8];
+    const pngHeader = [0x89, 0x50, 0x4E, 0x47];
+
+    if (fileBytes.length >= 2 &&
+        fileBytes[0] == jpgHeader[0] &&
+        fileBytes[1] == jpgHeader[1]) {
+      return true;
+    }
+
+    if (fileBytes.length >= 4 &&
+        fileBytes[0] == pngHeader[0] &&
+        fileBytes[1] == pngHeader[1] &&
+        fileBytes[2] == pngHeader[2] &&
+        fileBytes[3] == pngHeader[3]) {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool isValidModel(Uint8List fileBytes) {
+    const glbHeader = [0x67, 0x6C, 0x54, 0x46]; // "glTF"
+
+    if (fileBytes.length >= 4 &&
+        fileBytes[0] == glbHeader[0] &&
+        fileBytes[1] == glbHeader[1] &&
+        fileBytes[2] == glbHeader[2] &&
+        fileBytes[3] == glbHeader[3]) {
+      return true;
+    }
+
+    return false;
   }
 
   Future<String> uploadFile(Uint8List fileBytes, String path) async {
@@ -50,7 +135,6 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
       final storageRef = FirebaseStorage.instance.ref().child(path);
       final uploadTask = storageRef.putData(fileBytes);
 
-      // Track the upload task
       uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
         setState(() {
           _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
@@ -73,34 +157,83 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
 
       try {
         if (_imageBytes != null) {
-          _imageUrl = await uploadFile(_imageBytes!,
-              'images/${DateTime.now().millisecondsSinceEpoch}.png');
+          if (isValidImage(_imageBytes!)) {
+            _imageUrl = await uploadFile(_imageBytes!,
+                'images/${DateTime.now().millisecondsSinceEpoch}.png');
+          } else {
+            throw Exception('Invalid image file format.');
+          }
         }
+
         if (_modelBytes != null) {
-          _modelUrl = await uploadFile(_modelBytes!,
-              'models/${DateTime.now().millisecondsSinceEpoch}.glb');
+          if (isValidModel(_modelBytes!)) {
+            _modelUrl = await uploadFile(_modelBytes!,
+                'models/${DateTime.now().millisecondsSinceEpoch}.glb');
+          } else {
+            throw Exception('Invalid model file format.');
+          }
         }
 
-        final newObject = Model3d(
-          category: _category!,
-          objectName: _objectName!,
-          description: _description!,
-          imageUrl: _imageUrl,
-          modelUrl: _modelUrl,
-        );
+        if (widget.objectName != null) {
+          // Check if objectName is provided (editing mode)
+          final snapshot = await FirebaseFirestore.instance
+              .collection('models')
+              .where('objectName', isEqualTo: widget.objectName)
+              .limit(1)
+              .get();
 
-        await FirebaseFirestore.instance
-            .collection('models')
-            .add(newObject.toMap());
-        print('Object added to Firestore: ${newObject.toMap()}');
+          if (snapshot.docs.isNotEmpty) {
+            final docId = snapshot.docs.first.id;
+            await FirebaseFirestore.instance
+                .collection('models')
+                .doc(docId)
+                .update({
+              'category': _category,
+              'objectName': _objectName,
+              'description': _description,
+              'imageUrl': _imageUrl,
+              'modelUrl': _modelUrl,
+            });
+            print('Object updated in Firestore: $docId');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Object updated successfully')),
+            );
+          } else {
+            throw Exception('Object not found for updating');
+          }
+        } else {
+          // If objectName is null, check if the new objectName is unique
+          final existingObjectSnapshot = await FirebaseFirestore.instance
+              .collection('models')
+              .where('objectName', isEqualTo: _objectName)
+              .limit(1)
+              .get();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Object added successfully')),
-        );
+          if (existingObjectSnapshot.docs.isEmpty) {
+            final newObject = Model3d(
+              category: _category!,
+              objectName: _objectName!,
+              description: _description!,
+              imageUrl: _imageUrl,
+              modelUrl: _modelUrl,
+            );
+
+            await FirebaseFirestore.instance
+                .collection('models')
+                .add(newObject.toMap());
+            print('Object added to Firestore: ${newObject.toMap()}');
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Object added successfully')),
+            );
+          } else {
+            throw Exception('Object with the same name already exists');
+          }
+        }
       } catch (e) {
         print('Error saving to Firestore: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving object')),
+          SnackBar(content: Text('Error saving object: ${e.toString()}')),
         );
       }
     }
@@ -112,10 +245,12 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
-          'Add 3D Model Object',
-          style: TextStyle(color: Colors.white, fontSize: 28),
+          _objectName == null ? 'Add 3D Model Object' : 'Edit 3D Model Object',
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white70),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Form(
         key: _formKey,
@@ -157,6 +292,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
               ),
               const SizedBox(height: 5),
               TextFormField(
+                initialValue: _objectName ?? '',
                 style: TextStyle(color: Colors.white70),
                 decoration: InputDecoration(
                   filled: true,
@@ -180,6 +316,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
               ),
               const SizedBox(height: 5),
               TextFormField(
+                initialValue: _description ?? '',
                 style: TextStyle(color: Colors.white70),
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
@@ -217,8 +354,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
                       backgroundColor: Colors.grey[800],
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
-              _imageUrl == null ? Container() : Image.network(_imageUrl!),
-              SizedBox(height: 20),
+              SizedBox(height: 20), // Removed the image display here
               ElevatedButton.icon(
                 onPressed: () => pickFile(false),
                 icon: Icon(Icons.upload_file, color: Colors.black),
@@ -232,7 +368,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: saveToDatabase,
-                child: Text('Save to Database',
+                child: Text(_objectName == null ? 'Save to Database' : 'Update',
                     style: TextStyle(color: Colors.black)),
               ),
             ],

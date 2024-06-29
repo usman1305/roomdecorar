@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roomdecorar/item_model_view.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -43,63 +44,44 @@ class FurnitureItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: [
-        CustomItemWidget(
-          imageSrc: 'assets/modelImg/bed1.png',
-          alt: 'Bed 1',
-          itemName: 'Bed 1',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ItemModelView(
-                  modelSrc: 'assets/Models/Bed.glb',
-                  alt: 'Bed 1',
-                  itemName: 'Bed 1',
-                ),
-              ),
-            );
-          },
-        ),
-        CustomItemWidget(
-          imageSrc: 'assets/modelImg/sofa1.png',
-          alt: 'Sofa 1',
-          itemName: 'Sofa 1',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ItemModelView(
-                  modelSrc: 'assets/Models/Sofa.glb',
-                  alt: 'Sofa 1',
-                  itemName: 'Sofa 1',
-                ),
-              ),
-            );
-          },
-        ),
-        CustomItemWidget(
-          imageSrc: 'assets/modelImg/roundTable.png',
-          alt: 'Round Table 1',
-          itemName: 'Round Table 1',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ItemModelView(
-                  modelSrc: 'assets/Models/sidetable.glb',
-                  alt: 'Round Table 1',
-                  itemName: 'Round Table 1',
-                ),
-              ),
-            );
-          },
-        ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('models')
+          .where('category', isEqualTo: 'Furniture')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-        // Add more CustomItemWidget widgets as needed
-      ],
+        final items = snapshot.data!.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return CustomItemWidget(
+              imageSrc: item['imageUrl'] ?? '',
+              itemName: item['objectName'] ?? 'No name',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ItemModelView(
+                      modelSrc: item['modelUrl'] ?? '',
+                      itemName: item['objectName'] ?? 'No name',
+                      alt: '',
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -109,43 +91,56 @@ class DecorItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: [
-        CustomItemWidget(
-          imageSrc: 'assets/modelImg/sofa1.png',
-          alt: 'Sofa 1',
-          itemName: 'Sofa 1',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ItemModelView(
-                  modelSrc: 'assets/Models/Sofa.glb',
-                  alt: 'Sofa 1',
-                  itemName: 'Sofa 1',
-                ),
-              ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('models')
+          .where('category', isEqualTo: 'Wallpaper')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        final items = snapshot.data!.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return CustomItemWidget(
+              imageSrc: item['imageUrl'] ?? '',
+              itemName: item['objectName'] ?? 'No name',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ItemModelView(
+                      modelSrc: item['modelUrl'] ?? '',
+                      itemName: item['objectName'] ?? 'No name',
+                      alt: '',
+                    ),
+                  ),
+                );
+              },
             );
           },
-        ),
-
-        // Add more CustomItemWidget widgets as needed
-      ],
+        );
+      },
     );
   }
 }
 
 class CustomItemWidget extends StatelessWidget {
   final String imageSrc;
-  final String alt;
   final String itemName;
   final VoidCallback onPressed;
 
   const CustomItemWidget({
     Key? key,
     required this.imageSrc,
-    required this.alt,
     required this.itemName,
     required this.onPressed,
   }) : super(key: key);
@@ -153,6 +148,7 @@ class CustomItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap: onPressed,
       child: SizedBox(
         height: 200,
         child: Card(
@@ -163,19 +159,56 @@ class CustomItemWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(
+                Image.network(
                   imageSrc,
                   height: 150,
                   width: 170,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    String errorMessage = 'Failed to load image';
+                    if (error is Exception) {
+                      errorMessage = error.toString();
+                    } else if (error is String) {
+                      errorMessage = error;
+                    }
+                    debugPrint('Error loading image: $errorMessage');
+                    return Container(
+                      height: 150,
+                      width: 170,
+                      color: Colors.grey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error, color: Colors.red),
+                          SizedBox(height: 8),
+                          Text(
+                            'Image failed to load',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
                 Text(
                   itemName,
                   style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white70),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 InkWell(
@@ -185,12 +218,12 @@ class CustomItemWidget extends StatelessWidget {
                     children: [
                       Text(
                         'View Model',
-                        style: TextStyle(
-                          color: Colors.white60,
-                        ),
+                        style: TextStyle(color: Colors.white60),
                       ),
-                      Icon(Icons.arrow_forward_rounded,
-                          color: Color.fromRGBO(96, 218, 94, 1)),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Color.fromRGBO(96, 218, 94, 1),
+                      ),
                     ],
                   ),
                 ),
