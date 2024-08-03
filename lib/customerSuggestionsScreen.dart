@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:roomdecorar/Global.dart';
 import 'package:roomdecorar/model/item.dart';
 import 'package:roomdecorar/model/sugesstions.dart';
-
+import 'package:roomdecorar/Multiple3dObjectPlacement/ar_screen_multiple.dart';
 
 class Customersuggestionsscreen extends StatefulWidget {
   const Customersuggestionsscreen({super.key});
@@ -85,7 +85,7 @@ class _ViewSuggestionState extends State<Customersuggestionsscreen> {
                                   },
                                   style: ButtonStyle(
                                     backgroundColor:
-                                    MaterialStateProperty.all<Color>(const Color.fromARGB(255, 119, 119, 119)),
+                                    WidgetStateProperty.all<Color>(const Color.fromARGB(255, 119, 119, 119)),
                                   ),
                                   child: const Text(
                                     'View',
@@ -95,11 +95,18 @@ class _ViewSuggestionState extends State<Customersuggestionsscreen> {
                                 const SizedBox(width: 10),
                                 ElevatedButton(
                                   onPressed: () {
-
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Multiple3DItemPlacement(
+                                          suggestionSet: fetchedItems[index], // Pass the suggestionSet object
+                                        ),
+                                      ),
+                                    );
                                   },
                                   style: ButtonStyle(
                                     backgroundColor:
-                                    MaterialStateProperty.all<Color>(const Color.fromARGB(255, 119, 119, 119)),
+                                    WidgetStateProperty.all<Color>(const Color.fromARGB(255, 119, 119, 119)),
                                   ),
                                   child: const Text(
                                     'AR View',
