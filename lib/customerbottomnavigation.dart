@@ -2,8 +2,10 @@ import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:roomdecorar/homescreen.dart';
 import 'package:roomdecorar/userinfoscreen.dart';
+import 'package:roomdecorar/customersearch_screen.dart';
+import 'package:roomdecorar/customerSuggestionsScreen.dart';
 
-class BottomNaigationbarz extends StatefulWidget {
+class BottomNavigationBars extends StatefulWidget {
   @override
   State createState() {
     return _FluidNavBarDemoState();
@@ -64,9 +66,10 @@ class _FluidNavBarDemoState extends State {
           _child = HomeScreen();
           break;
         case 1:
-          //  _child = AccountContent();
+          _child = Customersuggestionsscreen();
           break;
         case 2:
+          _child = SearchScreen();
           break;
         case 3:
           _child = UserInfoScreen();

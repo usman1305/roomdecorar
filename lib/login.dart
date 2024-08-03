@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:roomdecorar/admin/view_suggestion.dart';
+import 'package:roomdecorar/adminmainscreen.dart';
 import 'package:roomdecorar/controller/LoginAuth.dart';
 import 'package:roomdecorar/adminnavigationbar.dart';
 import 'package:roomdecorar/customerbottomnavigation.dart';
@@ -151,7 +153,7 @@ class _MyLoginState extends State<MyLogin> {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => BottomNaigationbarz()));
+                      builder: (context) => BottomNavigationBars()));
             } catch (e) {
               // Show an error dialog if login fails
               showDialog(

@@ -21,13 +21,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/', // Set the initial route to login
+      initialRoute: '/',
       routes: {
         '/': (context) => const MyLogin(),
         'register': (context) => const MyRegister(),
         'homescreen': (context) => const HomeScreen(),
         'forgetpassword': (context) => const ForgotPasswordScreen(),
-        'bottomnaigation': (context) => BottomNaigationbarz(),
+        'bottomnaigation': (context) => BottomNavigationBars(),
         'userinfoscreen': (context) => UserInfoScreen(),
         'adminmain': (context) => AdminMainScreen()
       },

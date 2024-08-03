@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:roomdecorar/userinfoscreen.dart';
 import 'package:roomdecorar/adminmainscreen.dart';
 import 'package:roomdecorar/AddObjectScreen.dart';
+import 'package:roomdecorar/admin/view_suggestion.dart';
 import 'package:roomdecorar/view3dObjects.dart';
+import 'package:roomdecorar/admin_search_screen.dart';
 
 class AdminBottomNaigationbarz extends StatefulWidget {
   @override
@@ -17,7 +19,7 @@ class _FluidNavBarDemoState extends State {
 
   @override
   void initState() {
-    _child = AdminMainScreen();
+    _child = HomeScreen();
     super.initState();
   }
 
@@ -63,11 +65,13 @@ class _FluidNavBarDemoState extends State {
     setState(() {
       switch (index) {
         case 0:
-          _child = AdminMainScreen();
+          _child = HomeScreen();
           break;
         case 1:
+          _child = ViewSuggestion();
           break;
         case 2:
+          _child = AdminSearchScreen();
           break;
         case 3:
           _child = UserInfoScreen();

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:roomdecorar/view3dObjects.dart';
 
+import 'admin/view_suggestion.dart';
+
 class AdminMainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -54,7 +56,10 @@ class AdminMainScreen extends StatelessWidget {
                 elevation: 3,
               ),
               onPressed: () {
-                // Add functionality for the second button
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ViewSuggestion()),
+                );
               },
               child: Text('View Suggestion Set'),
             ),
