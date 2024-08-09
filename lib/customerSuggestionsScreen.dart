@@ -5,6 +5,8 @@ import 'package:roomdecorar/model/item.dart';
 import 'package:roomdecorar/model/sugesstions.dart';
 import 'package:roomdecorar/Multiple3dObjectPlacement/ar_screen_multiple.dart';
 
+import 'customersuggestionsetview.dart';
+
 class Customersuggestionsscreen extends StatefulWidget {
   const Customersuggestionsscreen({super.key});
 
@@ -72,7 +74,7 @@ class _ViewSuggestionState extends State<Customersuggestionsscreen> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              fetchedItems[index].desc,
+                              'Dimensions: ${fetchedItems[index].dimension}',
                               style: const TextStyle(color: Colors.white70),
                             ),
                             const SizedBox(height: 10),
@@ -81,7 +83,14 @@ class _ViewSuggestionState extends State<Customersuggestionsscreen> {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
-
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CustomerSuggestionSetView(
+                                          suggestionSet: fetchedItems[index],
+                                        ),
+                                      ),
+                                    );
                                   },
                                   style: ButtonStyle(
                                     backgroundColor:

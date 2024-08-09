@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roomdecorar/item_model_view.dart';
+import 'package:roomdecorar/ar_measure.dart';
+import 'package:roomdecorar/admin/view_decorset.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -9,34 +11,51 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
-    String appBarTitle =
-        user != null ? "Welcome back ${user.displayName} 👋" : "Room Decor AR";
+    String appBarTitle = user != null ? "Welcome ${user.displayName} 👋" : "Room Decor AR";
 
     return Scaffold(
       backgroundColor: Colors.black,
-
+      appBar: AppBar(
+        title: Text(
+          appBarTitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        actions: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(96, 218, 94, 1), // Background color of the button
+              borderRadius: BorderRadius.circular(16), // Rounded corners
+            ),
+            child: IconButton(
+              icon: Icon(Icons.auto_awesome, color: Colors.white), // Change this to your desired icon
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ViewDecorSet()),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppBar(
-              title: Text(
-                appBarTitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70),
-              ),
-              backgroundColor: Color.fromARGB(255, 0, 0, 0),
-            ),
             const SectionTitle(title: 'Furniture items'),
             const SizedBox(height: 250, child: FurnitureItems()),
             const SectionTitle(title: 'Wallart Designs'),
-            const SizedBox(height: 250, child: DecorItem())
+            const SizedBox(height: 250, child: DecorItem()),
           ],
         ),
       ),
       // bottomNavigationBar: BottomNavigation(),
     );
   }
+
 }
 
 class FurnitureItems extends StatelessWidget {

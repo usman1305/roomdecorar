@@ -7,7 +7,8 @@ class Item {
   final String category;
   final String height;
   final String width;
-  final String modelUrl; // Add this field for model source
+  final String modelUrl;
+  final String description;
   int counter;
 
   Item({
@@ -17,7 +18,8 @@ class Item {
     required this.category,
     required this.height,
     required this.width,
-    required this.modelUrl, // Make sure to initialize this field
+    required this.modelUrl,
+    required this.description,
     this.counter = 0,
   });
 
@@ -29,7 +31,8 @@ class Item {
       category: doc['category'],
       height: doc['height'],
       width: doc['width'],
-      modelUrl: doc['modelUrl'] ?? "", // Ensure modelSrc is fetched from Firestore
+      modelUrl: doc['modelUrl'] ?? "",
+      description: doc['description'] ?? ""
     );
   }
 }
