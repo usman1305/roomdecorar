@@ -14,8 +14,6 @@ import 'package:vector_math/vector_math_64.dart' as vector;
 
 import 'admin/add_decorset.dart';
 
-
-
 class ARMeasurePage extends StatefulWidget {
   @override
   _ARMeasurePageState createState() => _ARMeasurePageState();
@@ -28,75 +26,64 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
   List<ARNode> addedNodes = [];
   List<vector.Vector3> points = [];
   List<ARAnchor> anchors = [];
-  bool isLoading = false;
   List<double> distances = [];
-  bool isMeasurementComplete = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('AR Measure Page'),
-      ),
+      appBar: AppBar(title: Text('AR Measure Page')),
       body: Stack(
         children: [
           ARView(
             onARViewCreated: _onARViewCreated,
             planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
           ),
-          if (points.length == 2)
+          if (points.length >= 2)
             Positioned(
               bottom: 120,
               left: 20,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                color: Colors.white,
-                child: Text(
-                  'Distance 1: ${_calculateDistance(points[0], points[1]).toStringAsFixed(2)} meters',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
+              child: _buildDistanceInfo(1, points.sublist(0, 2)),
             ),
           if (points.length == 4)
             Positioned(
               bottom: 80,
               left: 20,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                color: Colors.white,
-                child: Text(
-                  'Distance 2: ${_calculateDistance(points[2], points[3]).toStringAsFixed(2)} meters',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
+              child: _buildDistanceInfo(2, points.sublist(2, 4)),
             ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: _handleDone,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                    ),
-                    child: Text('Done', style: TextStyle(color: Colors.white)),
+              child: ElevatedButton(
+                onPressed: _handleDone,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ],
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                ),
+                child: Text('Done', style: TextStyle(color: Colors.white)),
               ),
             ),
           ),
           if (isLoading)
-            Center(
-              child: CircularProgressIndicator(),
-            ),
+            Center(child: CircularProgressIndicator()),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDistanceInfo(int distanceIndex, List<vector.Vector3> points) {
+    double distance = _calculateDistance(points[0], points[1]);
+    double distanceInFeet = metersToFeet(distance);
+    return Container(
+      padding: EdgeInsets.all(10),
+      color: Colors.white,
+      child: Text(
+        'Distance $distanceIndex: ${distanceInFeet.toStringAsFixed(2)} feet',
+        style: TextStyle(fontSize: 16),
       ),
     );
   }
@@ -105,7 +92,8 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
       ARSessionManager arSessionManager,
       ARObjectManager arObjectManager,
       ARAnchorManager arAnchorManager,
-      ARLocationManager arLocationManager) {
+      ARLocationManager arLocationManager,
+      ) {
     this.arSessionManager = arSessionManager;
     this.arObjectManager = arObjectManager;
     this.arAnchorManager = arAnchorManager;
@@ -113,58 +101,53 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
     arSessionManager.onInitialize(
       showFeaturePoints: true,
       showPlanes: true,
-      showWorldOrigin: false,
       handleTaps: true,
-      handlePans: false,
-      handleRotation: false,
     );
 
     arObjectManager.onInitialize();
     arSessionManager.onPlaneOrPointTap = _handleOnPlaneOrPointTapped;
   }
 
-  void _handleOnPlaneOrPointTapped(List<ARHitTestResult> hitTestResults) async {
-    print('Hit Test Results: $hitTestResults'); // Debug print
+  Future<void> _handleOnPlaneOrPointTapped(List<ARHitTestResult> hitTestResults) async {
+    if (hitTestResults.isEmpty) {
+      print('No point hit.');
+      return;
+    }
 
-    if (hitTestResults.isNotEmpty) {
-      var hitTestResult = hitTestResults.first;
-      var position = vector.Vector3(
-        hitTestResult.worldTransform[12],
-        hitTestResult.worldTransform[13],
-        hitTestResult.worldTransform[14],
-      );
+    var hitTestResult = hitTestResults.first;
+    var position = vector.Vector3(
+      hitTestResult.worldTransform[12],
+      hitTestResult.worldTransform[13],
+      hitTestResult.worldTransform[14],
+    );
 
-      if (hitTestResult.type == ARHitTestResultType.plane) {
-        var newAnchor = ARPlaneAnchor(transformation: hitTestResult.worldTransform);
-        bool? didAddAnchor = await arAnchorManager!.addAnchor(newAnchor);
-        if (didAddAnchor!) {
-          anchors.add(newAnchor);
-          setState(() {
-            isLoading = true;
-          });
-          _addSphereNode(position);
-          setState(() {
-            isLoading = false;
-          });
-        } else {
-          print('Failed to add anchor.');
-        }
+    if (hitTestResult.type == ARHitTestResultType.plane) {
+      var newAnchor = ARPlaneAnchor(transformation: hitTestResult.worldTransform);
+      bool? didAddAnchor = await arAnchorManager!.addAnchor(newAnchor);
+
+      if (didAddAnchor == true) {
+        anchors.add(newAnchor);
+        setState(() {
+          isLoading = true;
+        });
+        _addSphereNode(position);
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        print('Failed to add anchor.');
       }
+    }
 
+    if (points.length < 4) {
       setState(() {
-        if (points.length < 4) {
-          points.add(position);
-          _addSphereNode(position);
+        points.add(position);
+        _addSphereNode(position);
 
-          if (points.length == 2) {
-            _addLine(points[0], points[1]);
-          } else if (points.length == 4) {
-            _addLine(points[2], points[3]);
-          }
+        if (points.length == 2 || points.length == 4) {
+          _addLine(points[points.length - 2], points[points.length - 1]);
         }
       });
-    } else {
-      print('No point hit. Debug info: ${hitTestResults.toString()}');
     }
   }
 
@@ -175,6 +158,7 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
       scale: vector.Vector3(0.3, 0.3, 0.3),
       position: position,
     );
+
     arObjectManager!.addNode(newNode).then((success) {
       if (success == true) {
         addedNodes.add(newNode);
@@ -194,8 +178,7 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
     final double ballSpacing = distance / (numberOfBalls + 1);
 
     for (int i = 1; i <= numberOfBalls; i++) {
-      final double t = i * ballSpacing;
-      final vector.Vector3 position = start + direction * t;
+      final vector.Vector3 position = start + direction * (i * ballSpacing);
 
       var newBallNode = ARNode(
         type: NodeType.webGLB,
@@ -221,27 +204,32 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
     return (start - end).length;
   }
 
+  double metersToFeet(double meters) {
+    return meters * 3.28084;
+  }
+
   void _handleDone() {
     if (points.length == 4) {
       final distance1 = _calculateDistance(points[0], points[1]);
       final distance2 = _calculateDistance(points[2], points[3]);
 
-      // Update the state with the new distances
       setState(() {
-        distances = [distance1, distance2];
-        isMeasurementComplete = true;
+        distances = [metersToFeet(distance1), metersToFeet(distance2)];
       });
 
-      // Ensure that the distances are updated before navigating
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AddDecorSet(distances: List.from(distances), id: '', name: '', desc: '',),
+            builder: (context) => AddDecorSet(
+              distances: List.from(distances),
+              id: '',
+              name: '',
+              desc: '',
+            ),
           ),
         );
       });
-
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please place four points to complete the measurement.')),
@@ -249,11 +237,9 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
     }
   }
 
-
   @override
   void dispose() {
     arSessionManager?.dispose();
     super.dispose();
   }
 }
-

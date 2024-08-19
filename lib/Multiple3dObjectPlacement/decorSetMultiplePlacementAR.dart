@@ -13,13 +13,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
 import '../model/item.dart';
-import '../model/sugesstions.dart';
+import '../model/decorset.dart';
 import 'package:flutter/material.dart' as material;
 
 class Multiple3DItemPlacement extends StatefulWidget {
-  final Sugesstions suggestionSet;
+  final DecorSet decorSet;
 
-  Multiple3DItemPlacement({Key? key, required this.suggestionSet}) : super(key: key);
+  Multiple3DItemPlacement({Key? key, required this.decorSet}) : super(key: key);
 
   @override
   _Multiple3DItemPlacementState createState() => _Multiple3DItemPlacementState();
@@ -43,8 +43,8 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
   }
 
   Future<void> _fetchModelDetails() async {
-    print('Fetching model details for suggestion set: ${widget.suggestionSet.name}');
-    List<String> itemIds = widget.suggestionSet.items.split(',');
+    print('Fetching model details for decor set: ${widget.decorSet.name}');
+    List<String> itemIds = widget.decorSet.items; // Updated to use items from DecorSet
 
     List<Item> fetchedItems = [];
     for (String itemId in itemIds) {
@@ -79,7 +79,6 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
 
   @override
   Widget build(BuildContext context) {
-    print('Building Multiple3DItemPlacement widget');
     return Scaffold(
       appBar: AppBar(
         title: Text('Place 3D Items'),
@@ -105,6 +104,7 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     bool isSelected = selectedModelSrc == item.modelUrl;
+
                     return GestureDetector(
                       onTap: () {
                         print('Selecting model ${item.modelUrl}');

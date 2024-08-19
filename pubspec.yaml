@@ -53,6 +53,7 @@ dependencies:
   flutter_cache_manager: ^3.3.1
   cached_network_image: ^3.3.1
   ar_flutter_plugin: ^0.7.3
+  flutter_cube: ^0.1.1
 
 dev_dependencies:
   flutter_test:

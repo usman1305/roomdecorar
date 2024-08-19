@@ -31,6 +31,7 @@ class _AdminSearchScreenState extends State<AdminSearchScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
+
             child: TextField(
               onChanged: (query) {
                 setState(() {
@@ -76,7 +77,7 @@ class _AdminSearchScreenState extends State<AdminSearchScreen> {
                     mainAxisSpacing: 8.0,
                     childAspectRatio: 0.75,
                   ),
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 90.0),
                   itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
                     final model = filteredItems[index];
@@ -85,7 +86,7 @@ class _AdminSearchScreenState extends State<AdminSearchScreen> {
                       child: CustomItemWidget(
                         imageSrc: model.imageUrl ?? 'assets/placeholder.png',
                         itemName: model.objectName,
-                        itemDescription: model.description ?? '',
+                        itemDescription: model.description,
                         modelUrl: model.modelUrl ?? '',
                       ),
                     );

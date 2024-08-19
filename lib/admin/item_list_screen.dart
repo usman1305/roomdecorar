@@ -180,7 +180,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
                     elevation: 3,
                   ),
                   child: const Text(
-                    'Update 3D Objects',
+                    'Add 3D Objects',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

@@ -72,7 +72,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     crossAxisSpacing: 8.0,
                     mainAxisSpacing: 8.0,
                   ),
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 90.0),
                   itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
                     final item = filteredItems[index];
