@@ -273,7 +273,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
                   style: TextStyle(color: Colors.white38),
                 ),
                 value: _category,
-                items: ['Furniture', 'Ceiling', 'Wallpaper']
+                items: ['Furniture', 'Ceiling', 'Wallpaper','Wallarts']
                     .map((category) => DropdownMenuItem(
                           value: category,
                           child: Text(

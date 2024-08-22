@@ -42,13 +42,19 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.only(
+            bottom: 120),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SectionTitle(title: 'Furniture items'),
             const SizedBox(height: 250, child: FurnitureItems()),
-            const SectionTitle(title: 'Wallart Designs'),
-            const SizedBox(height: 250, child: DecorItem()),
+            const SectionTitle(title: 'Wallpaper Designs'),
+            const SizedBox(height: 250, child: Wallpapers()),
+            const SectionTitle(title: 'Wallart Designs'), //update this
+            const SizedBox(height: 250, child: Wallarts()),
+            const SectionTitle(title: 'Ceilling Designs'),
+            const SizedBox(height: 250, child: Ceilings()),
           ],
         ),
       ),
@@ -93,8 +99,8 @@ class FurnitureItems extends StatelessWidget {
   }
 }
 
-class DecorItem extends StatelessWidget {
-  const DecorItem({Key? key}) : super(key: key);
+class Wallpapers extends StatelessWidget {
+  const Wallpapers({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +135,81 @@ class DecorItem extends StatelessWidget {
     );
   }
 }
+
+
+class Wallarts extends StatelessWidget {
+  const Wallarts({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('models')
+          .where('category', isEqualTo: 'Wallarts')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        final items = snapshot.data!.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return CustomItemWidget(
+              imageSrc: item['imageUrl'] ?? '',
+              itemName: item['objectName'] ?? 'No name',
+              itemDescription: item['description'] ?? 'No description',
+              modelUrl: item['modelUrl'] ?? '',
+            );
+          },
+        );
+      },
+    );
+  }
+}
+class Ceilings extends StatelessWidget {
+  const Ceilings({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('models')
+          .where('category', isEqualTo: 'Ceiling')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        final items = snapshot.data!.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return CustomItemWidget(
+              imageSrc: item['imageUrl'] ?? '',
+              itemName: item['objectName'] ?? 'No name',
+              itemDescription: item['description'] ?? 'No description',
+              modelUrl: item['modelUrl'] ?? '',
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
 
 class CustomItemWidget extends StatelessWidget {
   final String imageSrc;

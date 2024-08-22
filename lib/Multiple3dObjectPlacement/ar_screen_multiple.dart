@@ -32,7 +32,7 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
 
   List<Item> items = [];
   String? selectedModelSrc;
-  double modelScale = 0.2;
+  double modelScale = 1.0;
   bool isLoading = false;
 
   @override

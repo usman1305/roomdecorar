@@ -38,13 +38,16 @@ class HomeScreen extends StatelessWidget {
                 CategorySection(
                     category: 'Furniture', title: 'Furniture items'),
                 CategorySection(
-                    category: 'Wallpaper', title: 'Wallart Designs'),
+                    category: 'Wallpaper', title: 'Wallpapers'),
                 CategorySection(category: 'Ceiling', title: 'Ceiling items'),
+                CategorySection(
+                    category: 'Wallarts', title: 'Wallarts'),
               ],
             ),
+
           ),
           Positioned(
-            bottom: 10, // Adjust to avoid overlap with bottom edge
+            bottom: 70, // Adjust to avoid overlap with bottom edge
             right: 16, // Adjust to avoid overlap with right edge
             child: FloatingActionButton(
               onPressed: () {
