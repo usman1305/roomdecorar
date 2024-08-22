@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roomdecorar/item_model_view.dart';
 
@@ -134,7 +133,7 @@ class CustomItemWidget extends StatelessWidget {
               Expanded(
                 child: Image.network(
                   imageSrc,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                   errorBuilder: (context, error, stackTrace) {
                     String errorMessage = 'Failed to load image';
                     if (error is Exception) {

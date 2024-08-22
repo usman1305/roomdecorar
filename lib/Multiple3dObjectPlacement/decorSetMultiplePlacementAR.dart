@@ -1,3 +1,8 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:flutter/rendering.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:ar_flutter_plugin/ar_flutter_plugin.dart';
 import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'package:ar_flutter_plugin/datatypes/hittest_result_types.dart';
@@ -34,6 +39,7 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
   String? selectedModelSrc;
   double modelScale = 0.2;
   bool isLoading = false;
+  GlobalKey _globalKey = GlobalKey();
 
   @override
   void initState() {
@@ -79,6 +85,7 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
 
   @override
   Widget build(BuildContext context) {
+    print('Building Multiple3DItemPlacement widget');
     return Scaffold(
       appBar: AppBar(
         title: Text('Place 3D Items'),
@@ -86,9 +93,13 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
       ),
       body: Stack(
         children: [
-          ARView(
-            onARViewCreated: onARViewCreated,
-            planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
+          // Wrap ARView with RepaintBoundary
+          RepaintBoundary(
+            key: _globalKey, // Use the global key here
+            child: ARView(
+              onARViewCreated: onARViewCreated,
+              planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
+            ),
           ),
           if (isLoading)
             Center(child: CircularProgressIndicator()),
@@ -104,7 +115,6 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     bool isSelected = selectedModelSrc == item.modelUrl;
-
                     return GestureDetector(
                       onTap: () {
                         print('Selecting model ${item.modelUrl}');
@@ -129,6 +139,26 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
                       ),
                     );
                   },
+                ),
+              ),
+            ),
+          ),
+          // Camera icon button to save AR view
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0), // Padding for bottom
+              child: ElevatedButton(
+                onPressed: _saveARImage, // Save AR image on press
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  backgroundColor: Color.fromARGB(160, 0, 0, 255),
+                  padding: EdgeInsets.all(16),
+                ),
+                child: Icon(
+                  Icons.camera_alt,
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  size: 50,
                 ),
               ),
             ),
@@ -212,6 +242,34 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
       }
     } else {
       print('No valid plane hit test result found');
+    }
+  }
+  Future<void> _requestPermission() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+  }
+  Future<void> _saveARImage() async {
+    // Request storage permission
+    await _requestPermission();
+
+    try {
+      // Capture the AR view as an image
+      RenderRepaintBoundary boundary =
+      _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+      if (byteData != null) {
+        final result = await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
+        print(result);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Screenshot saved to gallery!')),
+        );
+      }
+    } catch (e) {
+      arSessionManager!.onError("Screenshot capture failed: $e");
     }
   }
 }

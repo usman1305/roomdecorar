@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:roomdecorar/Global.dart';
-import 'package:roomdecorar/model/item.dart';
 import 'package:roomdecorar/model/sugesstions.dart';
 import 'package:roomdecorar/Multiple3dObjectPlacement/ar_screen_multiple.dart';
 

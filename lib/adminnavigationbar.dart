@@ -1,8 +1,6 @@
 import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:roomdecorar/userinfoscreen.dart';
-import 'package:roomdecorar/adminmainscreen.dart';
-import 'package:roomdecorar/AddObjectScreen.dart';
 import 'package:roomdecorar/admin/view_suggestion.dart';
 import 'package:roomdecorar/view3dObjects.dart';
 import 'package:roomdecorar/admin_search_screen.dart';

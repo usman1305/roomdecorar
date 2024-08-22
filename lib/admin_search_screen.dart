@@ -66,7 +66,7 @@ class _AdminSearchScreenState extends State<AdminSearchScreen> {
                     .toList();
 
                 final filteredItems = items.where((item) {
-                  final name = (item.objectName as String).toLowerCase();
+                  final name = (item.objectName).toLowerCase();
                   return name.contains(_searchQuery);
                 }).toList();
 
