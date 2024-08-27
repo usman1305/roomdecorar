@@ -1,5 +1,9 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:ar_flutter_plugin/managers/ar_anchor_manager.dart';
+import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
+import 'package:ar_flutter_plugin/managers/ar_object_manager.dart';
+import 'package:ar_flutter_plugin/managers/ar_session_manager.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,10 +11,6 @@ import 'package:ar_flutter_plugin/ar_flutter_plugin.dart';
 import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'package:ar_flutter_plugin/datatypes/hittest_result_types.dart';
 import 'package:ar_flutter_plugin/datatypes/node_types.dart';
-import 'package:ar_flutter_plugin/managers/ar_anchor_manager.dart';
-import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
-import 'package:ar_flutter_plugin/managers/ar_object_manager.dart';
-import 'package:ar_flutter_plugin/managers/ar_session_manager.dart';
 import 'package:ar_flutter_plugin/models/ar_anchor.dart';
 import 'package:ar_flutter_plugin/models/ar_hittest_result.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
@@ -19,7 +19,6 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
 import '../model/item.dart';
 import '../model/decorset.dart';
-import 'package:flutter/material.dart' as material;
 
 class Multiple3DItemPlacement extends StatefulWidget {
   final DecorSet decorSet;
@@ -34,10 +33,13 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
   ARSessionManager? arSessionManager;
   ARObjectManager? arObjectManager;
   ARAnchorManager? arAnchorManager;
+  ARNode? lastAddedNode;
+  ARNode? selectedNode; // To track the currently selected node
+  final Map<ARNode, ARAnchor?> nodeAnchorMap = {};
 
   List<Item> items = [];
   String? selectedModelSrc;
-  double modelScale = 0.2;
+  double modelScale = 0.3;
   bool isLoading = false;
   GlobalKey _globalKey = GlobalKey();
 
@@ -50,7 +52,7 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
 
   Future<void> _fetchModelDetails() async {
     print('Fetching model details for decor set: ${widget.decorSet.name}');
-    List<String> itemIds = widget.decorSet.items; // Updated to use items from DecorSet
+    List<String> itemIds = widget.decorSet.items;
 
     List<Item> fetchedItems = [];
     for (String itemId in itemIds) {
@@ -93,9 +95,8 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
       ),
       body: Stack(
         children: [
-          // Wrap ARView with RepaintBoundary
           RepaintBoundary(
-            key: _globalKey, // Use the global key here
+            key: _globalKey,
             child: ARView(
               onARViewCreated: onARViewCreated,
               planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
@@ -128,7 +129,7 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: isSelected
-                                ? Border.all(color: material.Color.fromRGBO(96, 218, 94, 1), width: 3) // Highlight border color
+                                ? Border.all(color: Color.fromRGBO(96, 218, 94, 1), width: 3)
                                 : null,
                             image: DecorationImage(
                               image: NetworkImage(item.imageUrl),
@@ -143,13 +144,38 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
               ),
             ),
           ),
-          // Camera icon button to save AR view
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0, right: 20.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (selectedNode != null) {
+                    removeNode(selectedNode); // Remove the selected node
+                    selectedNode = null; // Clear the selected node
+                  } else {
+                    print('No node selected to remove');
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  backgroundColor: Color.fromARGB(255, 255, 0, 0),
+                  padding: EdgeInsets.all(16),
+                ),
+                child: Icon(
+                  Icons.delete,
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  size: 30,
+                ),
+              ),
+            ),
+          ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 20.0), // Padding for bottom
+              padding: const EdgeInsets.only(bottom: 10.0),
               child: ElevatedButton(
-                onPressed: _saveARImage, // Save AR image on press
+                onPressed: _saveARImage,
                 style: ElevatedButton.styleFrom(
                   shape: CircleBorder(),
                   backgroundColor: Color.fromARGB(160, 0, 0, 255),
@@ -172,12 +198,14 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
       ARSessionManager arSessionManager,
       ARObjectManager arObjectManager,
       ARAnchorManager arAnchorManager,
-      ARLocationManager arLocationManager,
+      ARLocationManager arLocationManager, // Add this parameter
       ) {
     print('AR View created');
     this.arSessionManager = arSessionManager;
     this.arObjectManager = arObjectManager;
     this.arAnchorManager = arAnchorManager;
+    // You can also save the ARLocationManager if needed
+    // this.arLocationManager = arLocationManager; // Uncomment if you want to use it
 
     this.arSessionManager!.onInitialize(
       showFeaturePoints: false,
@@ -189,8 +217,11 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
     this.arObjectManager!.onInitialize();
 
     this.arSessionManager!.onPlaneOrPointTap = onPlaneOrPointTapped;
-    print('AR View initialized and onPlaneOrPointTap callback set');
+    this.arObjectManager!.onNodeTap = onNodeTapped;
+
+    print('AR View initialized and onPlaneOrPointTap and onNodeTap callbacks set');
   }
+
 
   Future<void> onPlaneOrPointTapped(List<ARHitTestResult> hitTestResults) async {
     print('Plane or point tapped');
@@ -226,50 +257,82 @@ class _Multiple3DItemPlacementState extends State<Multiple3DItemPlacement> {
         );
 
         bool? didAddNodeToAnchor = await this.arObjectManager!.addNode(newNode, planeAnchor: newAnchor);
+
         setState(() {
           isLoading = false;
         });
 
         if (didAddNodeToAnchor != null && didAddNodeToAnchor) {
           print('Node added to anchor successfully');
+          nodeAnchorMap[newNode] = newAnchor; // Store the association
+          lastAddedNode = newNode;
         } else {
           print('Failed to add node to anchor');
-          this.arSessionManager!.onError("Adding Node to Anchor failed");
         }
       } else {
         print('Failed to add anchor');
-        this.arSessionManager!.onError("Adding Anchor failed");
       }
     } else {
-      print('No valid plane hit test result found');
+      print('No suitable hit test result found');
     }
   }
-  Future<void> _requestPermission() async {
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      await Permission.storage.request();
-    }
-  }
-  Future<void> _saveARImage() async {
-    // Request storage permission
-    await _requestPermission();
 
-    try {
-      // Capture the AR view as an image
-      RenderRepaintBoundary boundary =
-      _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary.toImage();
-      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  void onNodeTapped(List<String> nodeNames) {
+    print('Node tapped: $nodeNames');
 
-      if (byteData != null) {
-        final result = await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
-        print(result);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Screenshot saved to gallery!')),
-        );
+    for (String nodeName in nodeNames) {
+      ARNode? tappedNode = nodeAnchorMap.keys.firstWhere(
+            (node) => node.name == nodeName,
+
+      );
+      if (tappedNode != null) {
+        selectedNode = tappedNode; // Store the tapped node
+        print('Tapped node: ${tappedNode.name}');
+      } else {
+        print('Tapped node not found in nodeAnchorMap');
       }
-    } catch (e) {
-      arSessionManager!.onError("Screenshot capture failed: $e");
     }
+  }
+
+  Future<void> removeNode(ARNode? node) async {
+    if (node != null) {
+      ARAnchor? anchor = nodeAnchorMap[node];
+      if (anchor != null) {
+        await arObjectManager!.removeNode(node);
+        await arAnchorManager!.removeAnchor(anchor);
+        nodeAnchorMap.remove(node); // Remove the association
+        print('Node ${node.name} removed successfully');
+      } else {
+        print('Anchor for node not found');
+      }
+    }
+  }
+
+  Future<void> _saveARImage() async {
+    if (_globalKey.currentContext != null) {
+      RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+      await _saveImageToGallery(pngBytes);
+    }
+  }
+
+  Future<void> _saveImageToGallery(Uint8List imageBytes) async {
+    final status = await Permission.storage.request();
+    if (status.isGranted) {
+      final result = await ImageGallerySaver.saveImage(imageBytes);
+      print('Image saved to gallery: $result');
+    } else {
+      print('Permission denied to access storage');
+    }
+  }
+
+  @override
+  void dispose() {
+    arSessionManager?.dispose(); // Only dispose if the method exists
+    arObjectManager = null; // Cleanup ARObjectManager
+    arAnchorManager = null; // Cleanup ARAnchorManager
+    super.dispose();
   }
 }

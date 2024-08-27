@@ -99,7 +99,7 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
     this.arAnchorManager = arAnchorManager;
 
     arSessionManager.onInitialize(
-      showFeaturePoints: true,
+      showFeaturePoints: false,  // Disable feature points for better performance
       showPlanes: true,
       handleTaps: true,
     );
@@ -154,7 +154,7 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
   void _addSphereNode(vector.Vector3 position) {
     var newNode = ARNode(
       type: NodeType.webGLB,
-      uri: "https://firebasestorage.googleapis.com/v0/b/roomdecorarfyp.appspot.com/o/redball.glb?alt=media",
+      uri: "https://firebasestorage.googleapis.com/v0/b/roomdecorarfyp.appspot.com/o/final%20and%20initial%20point%203.glb?alt=media&token=d49e818b-1165-49f7-ac2c-76ac32593a9c",
       scale: vector.Vector3(0.3, 0.3, 0.3),
       position: position,
     );
@@ -172,7 +172,7 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
   }
 
   void _addLine(vector.Vector3 start, vector.Vector3 end) {
-    final int numberOfBalls = 10;
+    final int numberOfBalls = 5;  // Reduced number of nodes for better performance
     final double distance = (start - end).length;
     final vector.Vector3 direction = (end - start).normalized();
     final double ballSpacing = distance / (numberOfBalls + 1);
@@ -182,7 +182,7 @@ class _ARMeasurePageState extends State<ARMeasurePage> {
 
       var newBallNode = ARNode(
         type: NodeType.webGLB,
-        uri: "https://firebasestorage.googleapis.com/v0/b/roomdecorarfyp.appspot.com/o/redball.glb?alt=media",
+        uri: "https://firebasestorage.googleapis.com/v0/b/roomdecorarfyp.appspot.com/o/MeasuringPoints%20(3).glb?alt=media&token=b7d329a0-2b18-4891-9f8f-3d6516e238ce",
         scale: vector.Vector3(0.15, 0.15, 0.15),
         position: position,
       );

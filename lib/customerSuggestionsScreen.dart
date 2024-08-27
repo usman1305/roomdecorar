@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:roomdecorar/model/sugesstions.dart';
-import 'package:roomdecorar/Multiple3dObjectPlacement/ar_screen_multiple.dart';
-
+import 'package:roomdecorar/Multiple3dObjectPlacement/decorSet_ar_screen_multiplePlacement.dart';
 import 'customersuggestionsetview.dart';
 
 class Customersuggestionsscreen extends StatefulWidget {
@@ -91,8 +90,8 @@ class _ViewSuggestionState extends State<Customersuggestionsscreen> {
                                     );
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor:
-                                    WidgetStateProperty.all<Color>(const Color.fromARGB(255, 119, 119, 119)),
+                                    backgroundColor: MaterialStateProperty.all<Color>(
+                                        const Color.fromARGB(255, 119, 119, 119)),
                                   ),
                                   child: const Text(
                                     'View',
@@ -106,20 +105,24 @@ class _ViewSuggestionState extends State<Customersuggestionsscreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => Multiple3DItemPlacement(
-                                          suggestionSet: fetchedItems[index], // Pass the suggestionSet object
+                                          suggestionSet: fetchedItems[index], // Pass the suggestion set object
+                                          suggestions: fetchedItems[index], // Ensure you're passing the correct suggestion
+                                          sugesstions: fetchedItems[index], // Pass the suggestion set again (or another valid argument)
                                         ),
                                       ),
                                     );
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor:
-                                    WidgetStateProperty.all<Color>(const Color.fromARGB(255, 119, 119, 119)),
+                                    backgroundColor: MaterialStateProperty.all<Color>(
+                                      const Color.fromARGB(255, 119, 119, 119),
+                                    ),
                                   ),
                                   child: const Text(
                                     'AR View',
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ),
+
                               ],
                             ),
                           ],

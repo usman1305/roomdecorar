@@ -28,8 +28,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
   @override
   void initState() {
     super.initState();
-    _objectName =
-        widget.objectName; // Initialize objectName with provided value
+    _objectName = widget.objectName; // Initialize objectName with provided value
     if (_objectName != null) {
       // Load existing data if objectName is provided (editing mode)
       loadObjectData();
@@ -51,6 +50,8 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
           _description = modelData['description'];
           _imageUrl = modelData['imageUrl'];
           _modelUrl = modelData['modelUrl'];
+          // Set _objectName to ensure it matches the fetched data
+          _objectName = modelData['objectName'];
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -158,8 +159,8 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
       try {
         if (_imageBytes != null) {
           if (isValidImage(_imageBytes!)) {
-            _imageUrl = await uploadFile(_imageBytes!,
-                'images/${DateTime.now().millisecondsSinceEpoch}.png');
+            _imageUrl = await uploadFile(
+                _imageBytes!, 'images/${DateTime.now().millisecondsSinceEpoch}.png');
           } else {
             throw Exception('Invalid image file format.');
           }
@@ -167,8 +168,8 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
 
         if (_modelBytes != null) {
           if (isValidModel(_modelBytes!)) {
-            _modelUrl = await uploadFile(_modelBytes!,
-                'models/${DateTime.now().millisecondsSinceEpoch}.glb');
+            _modelUrl = await uploadFile(
+                _modelBytes!, 'models/${DateTime.now().millisecondsSinceEpoch}.glb');
           } else {
             throw Exception('Invalid model file format.');
           }
@@ -273,14 +274,14 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
                   style: TextStyle(color: Colors.white38),
                 ),
                 value: _category,
-                items: ['Furniture', 'Ceiling', 'Wallpaper','Wallarts']
+                items: ['Furniture', 'Ceiling', 'Wallpaper', 'Wallarts']
                     .map((category) => DropdownMenuItem(
-                          value: category,
-                          child: Text(
-                            category,
-                            style: TextStyle(color: Colors.white38),
-                          ),
-                        ))
+                  value: category,
+                  child: Text(
+                    category,
+                    style: TextStyle(color: Colors.white38),
+                  ),
+                ))
                     .toList(),
                 onChanged: (value) {
                   setState(() {
@@ -288,11 +289,11 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
                   });
                 },
                 validator: (value) =>
-                    value == null ? 'Please select a category' : null,
+                value == null ? 'Please select a category' : null,
               ),
               const SizedBox(height: 5),
               TextFormField(
-                initialValue: _objectName ?? '',
+                initialValue: _objectName, // Initialize with object name
                 style: TextStyle(color: Colors.white70),
                 decoration: InputDecoration(
                   filled: true,
@@ -316,7 +317,7 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
               ),
               const SizedBox(height: 5),
               TextFormField(
-                initialValue: _description ?? '',
+                initialValue: _description, // Initialize with description
                 style: TextStyle(color: Colors.white70),
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
@@ -344,27 +345,24 @@ class _AddObjectScreenState extends State<AddObjectScreen> {
               ElevatedButton.icon(
                 onPressed: () => pickFile(true),
                 icon: Icon(Icons.image, color: Colors.black),
-                label:
-                    Text('Upload Image', style: TextStyle(color: Colors.black)),
+                label: Text('Upload Image', style: TextStyle(color: Colors.black)),
               ),
               _imageBytes == null
                   ? Container()
                   : LinearProgressIndicator(
-                      value: _uploadProgress,
-                      backgroundColor: Colors.grey[800],
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-              SizedBox(height: 20), // Removed the image display here
+                value: _uploadProgress,
+                backgroundColor: Colors.grey[800],
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+              SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () => pickFile(false),
                 icon: Icon(Icons.upload_file, color: Colors.black),
-                label: Text('Upload 3D Model',
-                    style: TextStyle(color: Colors.black)),
+                label: Text('Upload 3D Model', style: TextStyle(color: Colors.black)),
               ),
               _modelBytes == null
                   ? Container()
-                  : Text('Model selected',
-                      style: TextStyle(color: Colors.white)),
+                  : Text('Model selected', style: TextStyle(color: Colors.white)),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: saveToDatabase,

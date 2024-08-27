@@ -5,7 +5,6 @@ class DecorSet {
   final String name;
   final String description;
   final List<String> items; // List of item IDs or references
-  final String imageUrl; // Optional: URL for an image of the decor set
   final String dimension; // New field for dimensions
 
   DecorSet({
@@ -13,7 +12,6 @@ class DecorSet {
     required this.name,
     required this.description,
     required this.items,
-    required this.imageUrl,
     required this.dimension, // Include dimension in constructor
   });
 
@@ -39,7 +37,6 @@ class DecorSet {
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       items: items,
-      imageUrl: data['imageUrl'] ?? '', // Optional: handle if imageUrl is null
       dimension: data['dimension'] ?? '', // Handle dimension field
     );
   }
@@ -49,7 +46,6 @@ class DecorSet {
       'name': name,
       'description': description,
       'items': items,
-      'imageUrl': imageUrl, // Optional: include if imageUrl is not null
       'dimension': dimension, // Include dimension in map
     };
   }

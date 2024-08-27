@@ -25,9 +25,12 @@ class _CustomerSuggestionSetViewState extends State<CustomerSuggestionSetView> {
 
   Future<void> _fetchModelDetails() async {
     print('Fetching model details for suggestion set: ${widget.suggestionSet.name}');
-    List<String> itemIds = widget.suggestionSet.items.split(',');
+
+    // Directly use the items list from suggestionSet
+    List<String> itemIds = widget.suggestionSet.items; // No need to split
 
     List<Item> fetchedItems = [];
+
     for (String itemId in itemIds) {
       print('Fetching item with ID: $itemId');
       try {
@@ -49,6 +52,7 @@ class _CustomerSuggestionSetViewState extends State<CustomerSuggestionSetView> {
       isLoading = false;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

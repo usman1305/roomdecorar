@@ -36,7 +36,7 @@ class _ViewSingle3DObjectState extends State<ViewSingle3DObject> {
   List<ARNode> nodes = [];
   List<ARAnchor> anchors = [];
   bool isLoading = false;
-  double modelScale = 1.0;
+  double modelScale = 0.6;
   GlobalKey _globalKey = GlobalKey();
 
   @override

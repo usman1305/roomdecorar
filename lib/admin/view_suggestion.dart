@@ -149,7 +149,7 @@ class _ViewSuggestionState extends State<ViewSuggestion> {
                                                   AddSuggestion(
                                                 id: fetchedItems[index].id,
                                                 name: fetchedItems[index].name,
-                                                desc: fetchedItems[index].desc,
+                                                desc: fetchedItems[index].description,
                                               ),
                                             ),
                                           );
